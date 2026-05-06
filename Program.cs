@@ -1,12 +1,102 @@
-﻿List<Kendaraan> data_kendaraan = new List<Kendaraan>()
+﻿using System.Threading.Channels;
+
+List<Kendaraan> data_kendaraan = new List<Kendaraan>()
 {
-    new Kendaraan("Vario", 50000, "N 6767 FFF"),
-    new Kendaraan("NMAX", 50000, "N 8888 AKU"),
-    new Mobil("Civic", 120000, "N 0001 NTT"),
-    new Mobil("Avanza", 115000, "N 2002 TKB"),
-    new MiniBus("Elf", 195000, "N 9876 JBL"),
+    new Kendaraan("Vario", 50000, "N 6767 DES"),
+    new Kendaraan("Beat", 100000, "N 7777 FAS"),
+    new Kendaraan("NMAX", 50000, "N 8888 KAM"),
+    new Mobil("Civic", 120000, "N 0001 SPK"),
+    new Mobil("Avanza", 115000, "N 2002 TGG"),
+    new MiniBus("Elf", 195000, "N 9876 NTA"),
     new MiniBus("HiAce", 200000, "N 0670 AHO")
 };
+
+while (true)
+{
+    Console.Clear();
+
+    Console.WriteLine(" ---Rental Kendaraan Fahri--- ");
+    Console.WriteLine("\n Daftar Kendaraan");
+    foreach (var dk in data_kendaraan)
+    {
+        dk.tampilkanInfo();
+    }
+
+    Console.Write("\nSilahkan Pilih Menu:");
+    Console.WriteLine("\n1. Sewa\n2. Kembali\n3. Keluar");
+    Console.Write("Masukkan Pilihan: ");
+    string pilihan = Console.ReadLine();
+
+    if (pilihan == "1")
+    {
+        //proses sewa
+
+        Console.WriteLine("\nInput nama Kendaraan: ");
+        string nama_Kendaraan = Console.ReadLine();
+
+        var cari_Kendaraan = data_kendaraan.FirstOrDefault(ck => string.Equals(nama_Kendaraan, ck.NamaKendaraan, StringComparison.OrdinalIgnoreCase));
+
+        if (cari_Kendaraan == null)
+        {
+            Console.WriteLine("\n Kendaraan tidak ditemukan");
+
+        }
+        else if (cari_Kendaraan.isAvailable)
+        {
+            Console.WriteLine("\nInput jumlah hari sewa: ");
+            int hari = int.Parse(Console.ReadLine());
+
+            double total_sewa = cari_Kendaraan.hitungTotal(hari);
+
+            cari_Kendaraan.ubahStatusKetersediaan();
+
+            Console.Write($"Total pembayaran sewa: Rp {total_sewa}");
+
+        }
+        else
+        {
+            Console.WriteLine("\nKendaraan tidak tersedia");
+        }
+
+    }
+    else if (pilihan == "2")
+    {
+        //proses kembali
+
+        Console.WriteLine("\nInput nama Kendaraan: ");
+        string nama_Kendaraan = Console.ReadLine();
+
+        var cari_Kendaraan = data_kendaraan.FirstOrDefault(ck => string.Equals(nama_Kendaraan, ck.NamaKendaraan, StringComparison.OrdinalIgnoreCase));
+
+        if (cari_Kendaraan == null)
+        {
+            Console.WriteLine("\n Kendaraan tidak ditemukan");
+
+        }
+        else if (!cari_Kendaraan.isAvailable)
+        {
+            cari_Kendaraan.ubahStatusKetersediaan();
+            Console.WriteLine("\nKendaraan berhasil dikembalikan");
+        }
+        else
+        {
+            Console.WriteLine("\nProses pengembalian tidak bisa dilakukan!");
+        }
+
+    }
+    else if (pilihan == "3")
+    {
+        Console.WriteLine("\nTekan ENTER untuk menutup aplikasi..");
+        Console.ReadLine();
+        break;
+    }
+    else
+    {
+        Console.WriteLine("\nPilihan Invalid!");
+    }
+    Console.WriteLine("\nTekan ENTER untuk mengulang");
+}
+
 class Kendaraan
 {
     protected string _namaKendaraan;
@@ -59,7 +149,7 @@ class Kendaraan
 
     public void tampilkanInfo()
     {
-        Console.WriteLine($"Nama Kendaraan: {_namaKendaraan}");
+        Console.WriteLine($"\nNama Kendaraan: {_namaKendaraan}");
         Console.WriteLine($"Harga Sewa Per Hari: {_hargaSewaPerHari}");
         Console.WriteLine($"Nomor Polisi: {_nomorPolisi}");
         Console.WriteLine($"Ketersediaan: {(IsAvailable ? "Tersedia" : "Tidak Tersedia")}");
